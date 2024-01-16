@@ -4,41 +4,32 @@ module.exports = {
     es2021: true,
   },
   extends: [
-    'airbnb-typescript',
-    'airbnb/hooks',
-    'plugin:import/typescript',
+    'eslint:recommended',
     'plugin:react/recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:prettier/recommended',
-    'plugin:import/recommended',
+    'plugin:react/jsx-runtime',
+    'plugin:react-hooks/recommended',
   ],
   ignorePatterns: ['.eslintrc.cjs', 'vite.config.ts'],
-  overrides: [
-    {
-      env: {
-        node: true,
-      },
-      files: ['.eslintrc.{js,cjs}'],
-      parserOptions: {
-        sourceType: 'script',
-      },
-    },
-  ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 'latest',
     project: ['./tsconfig.json', './tsconfig.node.json'],
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint', 'react', 'prettier'],
+  plugins: ['@typescript-eslint', 'react-refresh'],
   rules: {
-    'import/export': 0,
-    'prettier/prettier': [
-      'error',
-      {
-        endOfLine: 'auto',
-      },
-    ],
     'react/react-in-jsx-scope': 'off',
+  },
+  settings: {
+    'import/parsers': {
+      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      '@typescript-eslint/parser': ['.ts', '.tsx'],
+    },
+    'import/resolver': {
+      typescript: {
+        alwaysTryTypes: true,
+        project: './tsconfig.json',
+      },
+    },
   },
 };

@@ -13,9 +13,11 @@ function App() {
 }
 
 function WrappedApp() {
-  <BrowserRouter>
-    <App />
-  </BrowserRouter>;
+  return (
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  );
 }
 
 export default WrappedApp;
