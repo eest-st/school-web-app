@@ -8,6 +8,8 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:react/jsx-runtime',
     'plugin:react-hooks/recommended',
+    'plugin:@typescript-eslint/recommended',
+    'prettier/@typescript-eslint',
   ],
   ignorePatterns: ['.eslintrc.cjs', 'vite.config.ts'],
   parser: '@typescript-eslint/parser',
