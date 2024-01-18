@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { ReloadIcon } from '@radix-ui/react-icons';
 import { UseFormReturn, useForm } from 'react-hook-form';
 import * as z from 'zod';
 
@@ -13,6 +14,7 @@ import {
 } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { useLogin } from './hooks';
 
 const formSchema = z.object({
   username: z.string(),
@@ -55,6 +57,8 @@ function LoginForm({ form }: LoginFormProps) {
 }
 
 export default function Login() {
+  const { mutate: login, isPending } = useLogin();
+
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
       username: '',
@@ -64,6 +68,7 @@ export default function Login() {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
+    login(values);
     console.log('Values', values);
   };
 
@@ -80,8 +85,13 @@ export default function Login() {
           <LoginForm form={form} />
         </CardContent>
         <CardFooter className='w-full'>
-          <Button className='w-full bg-[#6317C3]' onClick={form.handleSubmit(onSubmit)}>
-            Iniciar Sesion
+          <Button
+            className='w-full bg-[#6317C3]'
+            disabled={isPending}
+            onClick={form.handleSubmit(onSubmit)}
+          >
+            {isPending && <ReloadIcon className='mr-2 h-4 w-4 animate-spin' />}
+            {isPending ? 'Iniciando Sesion' : 'Iniciar Sesion'}
           </Button>
         </CardFooter>
       </Card>
