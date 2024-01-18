@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ReloadIcon } from '@radix-ui/react-icons';
 import { UseFormReturn, useForm } from 'react-hook-form';
@@ -57,6 +58,7 @@ function LoginForm({ form }: LoginFormProps) {
 }
 
 export default function Login() {
+  const navigate = useNavigate();
   const { mutate: login, isPending } = useLogin();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -68,8 +70,7 @@ export default function Login() {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    login(values);
-    console.log('Values', values);
+    login(values, { onSuccess: () => navigate('/dashboard') });
   };
 
   return (
@@ -87,10 +88,13 @@ export default function Login() {
         <CardFooter className='w-full'>
           <Button
             className='w-full bg-[#6317C3]'
+            data-testid='login-button'
             disabled={isPending}
             onClick={form.handleSubmit(onSubmit)}
           >
-            {isPending && <ReloadIcon className='mr-2 h-4 w-4 animate-spin' />}
+            {isPending && (
+              <ReloadIcon className='mr-2 h-4 w-4 animate-spin' data-testid='loading-indicator' />
+            )}
             {isPending ? 'Iniciando Sesion' : 'Iniciar Sesion'}
           </Button>
         </CardFooter>
