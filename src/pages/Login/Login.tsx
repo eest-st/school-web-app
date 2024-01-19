@@ -3,6 +3,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ReloadIcon } from '@radix-ui/react-icons';
 import { UseFormReturn, useForm } from 'react-hook-form';
 import * as z from 'zod';
+import { toast } from 'react-toastify';
+import clsx from 'clsx';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -22,11 +24,17 @@ const formSchema = z.object({
   password: z.string(),
 });
 
+type FormSchema = z.infer<typeof formSchema>;
+
 interface LoginFormProps {
-  form: UseFormReturn<z.infer<typeof formSchema>>;
+  form: UseFormReturn<FormSchema>;
+  hasError: boolean;
 }
 
-function LoginForm({ form }: LoginFormProps) {
+function LoginForm({ form, hasError }: LoginFormProps) {
+  const inputClassName = clsx({ 'border-red-500 text-red-500': hasError });
+  const labelClassName = clsx('font-extralight', { 'text-red-500 font-extralight': hasError });
+
   return (
     <Form {...form}>
       <FormField
@@ -34,9 +42,15 @@ function LoginForm({ form }: LoginFormProps) {
         name='username'
         render={({ field }) => (
           <FormItem>
-            <FormLabel className='font-extralight'>Usuario</FormLabel>
+            <FormLabel className={labelClassName}>Usuario</FormLabel>
             <FormControl>
-              <Input data-testid='username' type='text' placeholder='martinpsalvado' {...field} />
+              <Input
+                className={inputClassName}
+                data-testid='username'
+                type='text'
+                placeholder='martinpsalvado'
+                {...field}
+              />
             </FormControl>
           </FormItem>
         )}
@@ -46,9 +60,15 @@ function LoginForm({ form }: LoginFormProps) {
         name='password'
         render={({ field }) => (
           <FormItem>
-            <FormLabel className='font-extralight'>Password</FormLabel>
+            <FormLabel className={labelClassName}>Password</FormLabel>
             <FormControl>
-              <Input data-testid='password' type='password' placeholder='********' {...field} />
+              <Input
+                className={inputClassName}
+                data-testid='password'
+                type='password'
+                placeholder='********'
+                {...field}
+              />
             </FormControl>
           </FormItem>
         )}
@@ -59,9 +79,9 @@ function LoginForm({ form }: LoginFormProps) {
 
 export default function Login() {
   const navigate = useNavigate();
-  const { mutate: login, isPending } = useLogin();
+  const { mutate: login, isError, isPending } = useLogin();
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormSchema>({
     defaultValues: {
       username: '',
       password: '',
@@ -69,8 +89,18 @@ export default function Login() {
     resolver: zodResolver(formSchema),
   });
 
+  const errorHandler = (error: any) => {
+    console.log('HERE', error);
+    if (error.response.status === 404) {
+      toast.error('El usuario no existe');
+    }
+  };
+
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    login(values, { onSuccess: () => navigate('/dashboard') });
+    login(values, {
+      onSuccess: () => navigate('/dashboard'),
+      onError: (error) => errorHandler(error),
+    });
   };
 
   return (
@@ -83,7 +113,7 @@ export default function Login() {
           </CardDescription>
         </CardHeader>
         <CardContent className='grid gap-4 w-full'>
-          <LoginForm form={form} />
+          <LoginForm form={form} hasError={isError} />
         </CardContent>
         <CardFooter className='w-full'>
           <Button
